@@ -12,6 +12,7 @@ import java.util.*;
 @ToString(callSuper = true, exclude = {"hospital", "citas"})
 @EqualsAndHashCode(callSuper = true, exclude = {"hospital", "citas"})
 @SuperBuilder
+
 public class Paciente extends Persona implements Serializable {
 
     private final HistoriaClinica historiaClinica;

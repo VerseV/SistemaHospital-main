@@ -6,12 +6,12 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
-import lombok.experimental.SuperBuilder;
+
 
 @Getter
 @ToString(exclude = {"citas", "departamento"}) // evitamos recursividad
 @EqualsAndHashCode(of = {"numero", "departamento"}) // clave natural
-@SuperBuilder
+@Builder
 
 public class Sala implements Serializable {
 

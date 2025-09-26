@@ -14,6 +14,7 @@ import org.jcr.Entidades.Exceptions.CitaException;
 @ToString(exclude = {"paciente", "medico", "sala"})
 @EqualsAndHashCode(of = {"paciente", "medico", "fechaHora"}) // clave natural
 @Builder
+
 public class Cita implements Serializable {
 
     private final Paciente paciente;

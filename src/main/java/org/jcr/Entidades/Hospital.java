@@ -3,12 +3,12 @@ package org.jcr.Entidades;
 import lombok.*;
 import java.io.Serializable;
 import java.util.*;
-import lombok.experimental.SuperBuilder;
+
 
 @Getter
 @ToString(exclude = {"departamentos", "pacientes"})
 @EqualsAndHashCode(exclude = {"departamentos", "pacientes"})
-@SuperBuilder
+@Builder
 
 public class Hospital implements Serializable {
 
