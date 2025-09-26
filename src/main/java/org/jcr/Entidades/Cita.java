@@ -14,7 +14,6 @@ import org.jcr.Entidades.Exceptions.CitaException;
 @ToString(exclude = {"paciente", "medico", "sala"})
 @EqualsAndHashCode(of = {"paciente", "medico", "fechaHora"}) // clave natural
 @Builder
-
 public class Cita implements Serializable {
 
     private final Paciente paciente;
@@ -24,25 +23,39 @@ public class Cita implements Serializable {
     private final BigDecimal costo;
 
     @Setter
-    private EstadoCita estado;
+    @Builder.Default
+    private EstadoCita estado = EstadoCita.PROGRAMADA;
 
     @Setter
-    private String observaciones;
+    @Builder.Default
+    private String observaciones = "";
 
-    public Cita(Paciente paciente,
-                Medico medico,
-                Sala sala,
-                LocalDateTime fechaHora,
-                BigDecimal costo) {
+    // 🔒 Validaciones centralizadas
+    @Builder
+    private Cita(Paciente paciente,
+                 Medico medico,
+                 Sala sala,
+                 LocalDateTime fechaHora,
+                 BigDecimal costo,
+                 EstadoCita estado,
+                 String observaciones) {
 
         this.paciente = Objects.requireNonNull(paciente, "El paciente no puede ser nulo");
         this.medico = Objects.requireNonNull(medico, "El médico no puede ser nulo");
         this.sala = Objects.requireNonNull(sala, "La sala no puede ser nula");
         this.fechaHora = Objects.requireNonNull(fechaHora, "La fecha y hora no pueden ser nulas");
-        this.costo = Objects.requireNonNull(costo, "El costo no puede ser nulo");
+        this.costo = validarCosto(costo);
 
-        this.estado = EstadoCita.PROGRAMADA;
-        this.observaciones = "";
+        this.estado = (estado != null) ? estado : EstadoCita.PROGRAMADA;
+        this.observaciones = (observaciones != null) ? observaciones : "";
+    }
+
+    private BigDecimal validarCosto(BigDecimal costo) {
+        Objects.requireNonNull(costo, "El costo no puede ser nulo");
+        if (costo.compareTo(BigDecimal.ZERO) < 0) {
+            throw new IllegalArgumentException("El costo no puede ser negativo");
+        }
+        return costo;
     }
 
     public String toCsvString() {
@@ -81,17 +94,15 @@ public class Cita implements Serializable {
         if (medico == null) throw new CitaException("Médico no encontrado: " + dniMedico);
         if (sala == null) throw new CitaException("Sala no encontrada: " + numeroSala);
 
-        Cita cita = Cita.builder()
+        return Cita.builder()
                 .paciente(paciente)
                 .medico(medico)
                 .sala(sala)
                 .fechaHora(fechaHora)
                 .costo(costo)
+                .estado(estado)
+                .observaciones(observaciones)
                 .build();
-
-        cita.setEstado(estado);
-        cita.setObservaciones(observaciones);
-
-        return cita;
     }
 }
+

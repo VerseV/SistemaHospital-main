@@ -13,6 +13,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 @Slf4j
 @ToString(exclude = {"citas", "citasPorPaciente", "citasPorMedico", "citasPorSala"})
+
 public class CitaManager implements CitaService, Serializable {
 
     private final List<Cita> citas = new ArrayList<>();
@@ -35,7 +36,14 @@ public class CitaManager implements CitaService, Serializable {
             throw new CitaException("La especialidad del médico no coincide con el departamento de la sala.");
         }
 
-        Cita cita = new Cita(paciente, medico, sala, fechaHora, costo);
+        Cita cita = Cita.builder()
+                .paciente(paciente)
+                .medico(medico)
+                .sala(sala)
+                .fechaHora(fechaHora)
+                .costo(costo)
+                .build();
+
         citas.add(cita);
 
         actualizarIndicePaciente(paciente, cita);
@@ -48,6 +56,7 @@ public class CitaManager implements CitaService, Serializable {
 
         return cita;
     }
+
 
     private void validarCita(LocalDateTime fechaHora, BigDecimal costo) throws CitaException {
         if (fechaHora.isBefore(LocalDateTime.now())) {
@@ -131,11 +140,14 @@ public class CitaManager implements CitaService, Serializable {
             String line;
             while ((line = reader.readLine()) != null) {
                 try {
+                    // 🔹 Usamos el método fromCsvString de Cita, que ya trabaja con builder
                     Cita cita = Cita.fromCsvString(line, pacientes, medicos, salas);
+
                     citas.add(cita);
                     actualizarIndicePaciente(cita.getPaciente(), cita);
                     actualizarIndiceMedico(cita.getMedico(), cita);
                     actualizarIndiceSala(cita.getSala(), cita);
+
                 } catch (CitaException e) {
                     log.error("Error al cargar cita desde CSV: {} - {}", line, e.getMessage());
                     throw e;
@@ -144,4 +156,3 @@ public class CitaManager implements CitaService, Serializable {
         }
     }
 }
-
