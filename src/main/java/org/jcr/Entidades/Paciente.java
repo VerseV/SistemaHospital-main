@@ -1,43 +1,36 @@
 package org.jcr.Entidades;
 
+import lombok.*;
+import lombok.experimental.SuperBuilder;
 import org.jcr.Entidades.Enums.TipoSangre;
 
 import java.io.Serializable;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
+@Getter
+@ToString(callSuper = true, exclude = {"hospital", "citas"})
+@EqualsAndHashCode(callSuper = true, exclude = {"hospital", "citas"})
+@SuperBuilder
 public class Paciente extends Persona implements Serializable {
+
     private final HistoriaClinica historiaClinica;
     private final String telefono;
     private final String direccion;
+
+    @Setter
     private Hospital hospital;
+
+    @Builder.Default
     private final List<Cita> citas = new ArrayList<>();
 
+    @Builder
     public Paciente(String nombre, String apellido, String dni, LocalDate fechaNacimiento,
                     TipoSangre tipoSangre, String telefono, String direccion) {
         super(nombre, apellido, dni, fechaNacimiento, tipoSangre);
         this.telefono = validarString(telefono, "El teléfono no puede ser nulo ni vacío");
         this.direccion = validarString(direccion, "La dirección no puede ser nula ni vacía");
         this.historiaClinica = new HistoriaClinica(this);
-    }
-
-    public HistoriaClinica getHistoriaClinica() {
-        return historiaClinica;
-    }
-
-    public String getTelefono() {
-        return telefono;
-    }
-
-    public String getDireccion() {
-        return direccion;
-    }
-
-    public Hospital getHospital() {
-        return hospital;
     }
 
     public void setHospital(Hospital hospital) {
@@ -66,16 +59,5 @@ public class Paciente extends Persona implements Serializable {
             throw new IllegalArgumentException(mensajeError);
         }
         return valor;
-    }
-
-    @Override
-    public String toString() {
-        return "Paciente{" +
-                "nombre='" + nombre + '\'' +
-                ", apellido='" + apellido + '\'' +
-                ", dni='" + dni + '\'' +
-                ", telefono='" + telefono + '\'' +
-                ", tipoSangre=" + tipoSangre.getDescripcion() +
-                '}';
     }
 }
