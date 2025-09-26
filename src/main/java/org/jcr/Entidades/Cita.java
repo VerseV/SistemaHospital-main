@@ -1,4 +1,7 @@
 package org.jcr.Entidades;
+
+import lombok.*;
+import lombok.experimental.SuperBuilder;
 import org.jcr.Entidades.Enums.EstadoCita;
 import org.jcr.Entidades.Exceptions.CitaException;
 
@@ -8,71 +11,39 @@ import java.time.LocalDateTime;
 import java.util.Map;
 import java.util.Objects;
 
+@Getter
+@ToString(exclude = {"paciente", "medico", "sala"})
+@EqualsAndHashCode(exclude = {"paciente", "medico", "sala"})
+@SuperBuilder
 public class Cita implements Serializable {
+
     private final Paciente paciente;
     private final Medico medico;
     private final Sala sala;
     private final LocalDateTime fechaHora;
     private final BigDecimal costo;
+
+    @Setter
     private EstadoCita estado;
+
+    @Setter
     private String observaciones;
 
-    public Cita(Paciente paciente, Medico medico, Sala sala, LocalDateTime fechaHora, BigDecimal costo) {
+    @Builder
+    public Cita(Paciente paciente,
+                Medico medico,
+                Sala sala,
+                LocalDateTime fechaHora,
+                BigDecimal costo) {
+
         this.paciente = Objects.requireNonNull(paciente, "El paciente no puede ser nulo");
         this.medico = Objects.requireNonNull(medico, "El médico no puede ser nulo");
         this.sala = Objects.requireNonNull(sala, "La sala no puede ser nula");
         this.fechaHora = Objects.requireNonNull(fechaHora, "La fecha y hora no pueden ser nulas");
         this.costo = Objects.requireNonNull(costo, "El costo no puede ser nulo");
+
         this.estado = EstadoCita.PROGRAMADA;
         this.observaciones = "";
-    }
-
-    public Paciente getPaciente() {
-        return paciente;
-    }
-
-    public Medico getMedico() {
-        return medico;
-    }
-
-    public Sala getSala() {
-        return sala;
-    }
-
-    public LocalDateTime getFechaHora() {
-        return fechaHora;
-    }
-
-    public BigDecimal getCosto() {
-        return costo;
-    }
-
-    public EstadoCita getEstado() {
-        return estado;
-    }
-
-    public void setEstado(EstadoCita estado) {
-        this.estado = Objects.requireNonNull(estado, "El estado no puede ser nulo");
-    }
-
-    public String getObservaciones() {
-        return observaciones;
-    }
-
-    public void setObservaciones(String observaciones) {
-        this.observaciones = observaciones != null ? observaciones : "";
-    }
-
-    @Override
-    public String toString() {
-        return "Cita{" +
-                "paciente=" + paciente.getNombreCompleto() +
-                ", medico=" + medico.getNombreCompleto() +
-                ", sala=" + sala.getNumero() +
-                ", fechaHora=" + fechaHora +
-                ", estado=" + estado.getDescripcion() +
-                ", costo=" + costo +
-                '}';
     }
 
     public String toCsvString() {
@@ -117,10 +88,18 @@ public class Cita implements Serializable {
             throw new CitaException("Sala no encontrada: " + numeroSala);
         }
 
-        Cita cita = new Cita(paciente, medico, sala, fechaHora, costo);
+        Cita cita = Cita.builder()
+                .paciente(paciente)
+                .medico(medico)
+                .sala(sala)
+                .fechaHora(fechaHora)
+                .costo(costo)
+                .build();
+
         cita.setEstado(estado);
         cita.setObservaciones(observaciones);
 
         return cita;
     }
 }
+
