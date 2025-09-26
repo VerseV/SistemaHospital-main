@@ -2,7 +2,7 @@ package org.jcr.Entidades;
 
 import lombok.Getter;
 import lombok.ToString;
-import lombok.experimental.SuperBuilder; 
+import lombok.experimental.SuperBuilder;
 import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.Objects;
