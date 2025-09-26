@@ -18,8 +18,6 @@ public class Paciente extends Persona implements Serializable {
     private final HistoriaClinica historiaClinica;
     private final String telefono;
     private final String direccion;
-
-    @Setter
     private Hospital hospital;
 
     @Builder.Default
