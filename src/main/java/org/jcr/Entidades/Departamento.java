@@ -1,4 +1,7 @@
 package org.jcr.Entidades;
+
+import lombok.Getter;
+import lombok.ToString;
 import org.jcr.Entidades.Enums.EspecialidadMedica;
 
 import java.io.Serializable;
@@ -6,6 +9,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+
+@Getter
+@ToString(exclude = {"hospital", "medicos", "salas"})
 
 public class Departamento implements Serializable {
     private final String nombre;
@@ -17,18 +23,6 @@ public class Departamento implements Serializable {
     public Departamento(String nombre, EspecialidadMedica especialidad) {
         this.nombre = validarString(nombre, "El nombre del departamento no puede ser nulo ni vacío");
         this.especialidad = Objects.requireNonNull(especialidad, "La especialidad no puede ser nula");
-    }
-
-    public String getNombre() {
-        return nombre;
-    }
-
-    public EspecialidadMedica getEspecialidad() {
-        return especialidad;
-    }
-
-    public Hospital getHospital() {
-        return hospital;
     }
 
     public void setHospital(Hospital hospital) {
@@ -64,15 +58,6 @@ public class Departamento implements Serializable {
         return Collections.unmodifiableList(salas);
     }
 
-    @Override
-    public String toString() {
-        return "Departamento{" +
-                "nombre='" + nombre + '\'' +
-                ", especialidad=" + especialidad.getDescripcion() +
-                ", hospital=" + (hospital != null ? hospital.getNombre() : "null") +
-                '}';
-    }
-
     private String validarString(String valor, String mensajeError) {
         Objects.requireNonNull(valor, mensajeError);
         if (valor.trim().isEmpty()) {
@@ -81,3 +66,4 @@ public class Departamento implements Serializable {
         return valor;
     }
 }
+
