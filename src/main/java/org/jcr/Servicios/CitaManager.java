@@ -1,18 +1,20 @@
 package org.jcr.Servicios;
 
+import lombok.ToString;
+import lombok.extern.slf4j.Slf4j;
 import org.jcr.Entidades.*;
 import org.jcr.Entidades.Exceptions.CitaException;
 
 import java.io.*;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 import java.math.BigDecimal;
-import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class CitaManager implements CitaService {
+@Slf4j
+@ToString(exclude = {"citas", "citasPorPaciente", "citasPorMedico", "citasPorSala"})
+public class CitaManager implements CitaService, Serializable {
+
     private final List<Cita> citas = new ArrayList<>();
     private final Map<Paciente, List<Cita>> citasPorPaciente = new ConcurrentHashMap<>();
     private final Map<Medico, List<Cita>> citasPorMedico = new ConcurrentHashMap<>();
@@ -21,17 +23,14 @@ public class CitaManager implements CitaService {
     @Override
     public Cita programarCita(Paciente paciente, Medico medico, Sala sala,
                               LocalDateTime fechaHora, BigDecimal costo) throws CitaException {
-
         validarCita(fechaHora, costo);
 
         if (!esMedicoDisponible(medico, fechaHora)) {
             throw new CitaException("El médico no está disponible en la fecha y hora solicitadas.");
         }
-
         if (!esSalaDisponible(sala, fechaHora)) {
             throw new CitaException("La sala no está disponible en la fecha y hora solicitadas.");
         }
-
         if (!medico.getEspecialidad().equals(sala.getDepartamento().getEspecialidad())) {
             throw new CitaException("La especialidad del médico no coincide con el departamento de la sala.");
         }
@@ -54,7 +53,6 @@ public class CitaManager implements CitaService {
         if (fechaHora.isBefore(LocalDateTime.now())) {
             throw new CitaException("No se puede programar una cita en el pasado.");
         }
-
         if (costo.compareTo(BigDecimal.ZERO) <= 0) {
             throw new CitaException("El costo debe ser mayor que cero.");
         }
@@ -64,7 +62,7 @@ public class CitaManager implements CitaService {
         List<Cita> citasExistentes = citasPorMedico.get(medico);
         if (citasExistentes != null) {
             for (Cita citaExistente : citasExistentes) {
-                if (Math.abs(citaExistente.getFechaHora().compareTo(fechaHora)) < 2) { // 2 horas de diferencia
+                if (Math.abs(citaExistente.getFechaHora().compareTo(fechaHora)) < 2) {
                     return false;
                 }
             }
@@ -76,7 +74,7 @@ public class CitaManager implements CitaService {
         List<Cita> citasExistentes = citasPorSala.get(sala);
         if (citasExistentes != null) {
             for (Cita citaExistente : citasExistentes) {
-                if (Math.abs(citaExistente.getFechaHora().compareTo(fechaHora)) < 2) { // 2 horas de diferencia
+                if (Math.abs(citaExistente.getFechaHora().compareTo(fechaHora)) < 2) {
                     return false;
                 }
             }
@@ -85,60 +83,30 @@ public class CitaManager implements CitaService {
     }
 
     private void actualizarIndicePaciente(Paciente paciente, Cita cita) {
-        List<Cita> citasPaciente = citasPorPaciente.get(paciente);
-        if (citasPaciente == null) {
-            citasPaciente = new ArrayList<>();
-            citasPorPaciente.put(paciente, citasPaciente);
-        }
-        citasPaciente.add(cita);
+        citasPorPaciente.computeIfAbsent(paciente, p -> new ArrayList<>()).add(cita);
     }
 
     private void actualizarIndiceMedico(Medico medico, Cita cita) {
-        List<Cita> citasMedico = citasPorMedico.get(medico);
-        if (citasMedico == null) {
-            citasMedico = new ArrayList<>();
-            citasPorMedico.put(medico, citasMedico);
-        }
-        citasMedico.add(cita);
+        citasPorMedico.computeIfAbsent(medico, m -> new ArrayList<>()).add(cita);
     }
 
     private void actualizarIndiceSala(Sala sala, Cita cita) {
-        List<Cita> citasSala = citasPorSala.get(sala);
-        if (citasSala == null) {
-            citasSala = new ArrayList<>();
-            citasPorSala.put(sala, citasSala);
-        }
-        citasSala.add(cita);
+        citasPorSala.computeIfAbsent(sala, s -> new ArrayList<>()).add(cita);
     }
 
     @Override
     public List<Cita> getCitasPorPaciente(Paciente paciente) {
-        List<Cita> citasPaciente = citasPorPaciente.get(paciente);
-        if (citasPaciente != null) {
-            return Collections.unmodifiableList(citasPaciente);
-        } else {
-            return Collections.emptyList();
-        }
+        return Collections.unmodifiableList(citasPorPaciente.getOrDefault(paciente, Collections.emptyList()));
     }
 
     @Override
     public List<Cita> getCitasPorMedico(Medico medico) {
-        List<Cita> citasMedico = citasPorMedico.get(medico);
-        if (citasMedico != null) {
-            return Collections.unmodifiableList(citasMedico);
-        } else {
-            return Collections.emptyList();
-        }
+        return Collections.unmodifiableList(citasPorMedico.getOrDefault(medico, Collections.emptyList()));
     }
 
     @Override
     public List<Cita> getCitasPorSala(Sala sala) {
-        List<Cita> citasSala = citasPorSala.get(sala);
-        if (citasSala != null) {
-            return Collections.unmodifiableList(citasSala);
-        } else {
-            return Collections.emptyList();
-        }
+        return Collections.unmodifiableList(citasPorSala.getOrDefault(sala, Collections.emptyList()));
     }
 
     @Override
@@ -153,7 +121,7 @@ public class CitaManager implements CitaService {
     @Override
     public void cargarCitas(String filename, Map<String, Paciente> pacientes,
                             Map<String, Medico> medicos, Map<String, Sala> salas)
-            throws IOException, ClassNotFoundException, CitaException {
+            throws IOException, CitaException {
         citas.clear();
         citasPorPaciente.clear();
         citasPorMedico.clear();
@@ -169,10 +137,11 @@ public class CitaManager implements CitaService {
                     actualizarIndiceMedico(cita.getMedico(), cita);
                     actualizarIndiceSala(cita.getSala(), cita);
                 } catch (CitaException e) {
-                    System.err.println("Error al cargar cita desde CSV: " + line + " - " + e.getMessage());
+                    log.error("Error al cargar cita desde CSV: {} - {}", line, e.getMessage());
                     throw e;
                 }
             }
         }
     }
 }
+
