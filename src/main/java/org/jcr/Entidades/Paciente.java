@@ -22,8 +22,7 @@ public class Paciente extends Persona implements Serializable {
 
     @Builder.Default
     private final List<Cita> citas = new ArrayList<>();
-
-    @Builder
+    
     public Paciente(String nombre, String apellido, String dni, LocalDate fechaNacimiento,
                     TipoSangre tipoSangre, String telefono, String direccion) {
         super(nombre, apellido, dni, fechaNacimiento, tipoSangre);
