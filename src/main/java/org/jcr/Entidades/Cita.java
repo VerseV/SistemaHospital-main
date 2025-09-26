@@ -94,15 +94,29 @@ public class Cita implements Serializable {
         if (medico == null) throw new CitaException("Médico no encontrado: " + dniMedico);
         if (sala == null) throw new CitaException("Sala no encontrada: " + numeroSala);
 
-        return Cita.builder()
+        // 🔹 Validaciones igual que en programarCita
+        if (fechaHora.isBefore(LocalDateTime.now())) {
+            throw new CitaException("No se puede cargar una cita con fecha en el pasado: " + fechaHora);
+        }
+        if (costo.compareTo(BigDecimal.ZERO) <= 0) {
+            throw new CitaException("El costo debe ser mayor que cero. Valor: " + costo);
+        }
+        if (!medico.getEspecialidad().equals(sala.getDepartamento().getEspecialidad())) {
+            throw new CitaException("La especialidad del médico no coincide con el departamento de la sala.");
+        }
+
+        // Construcción segura de la cita
+        Cita cita = Cita.builder()
                 .paciente(paciente)
                 .medico(medico)
                 .sala(sala)
                 .fechaHora(fechaHora)
                 .costo(costo)
-                .estado(estado)
-                .observaciones(observaciones)
                 .build();
+
+        cita.setEstado(estado);
+        cita.setObservaciones(observaciones);
+
+        return cita;
     }
 }
-
