@@ -1,20 +1,19 @@
 package org.jcr.Entidades;
 
 import lombok.*;
-import lombok.experimental.SuperBuilder;
-import org.jcr.Entidades.Enums.EstadoCita;
-import org.jcr.Entidades.Exceptions.CitaException;
-
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Map;
 import java.util.Objects;
 
+import org.jcr.Entidades.Enums.EstadoCita;
+import org.jcr.Entidades.Exceptions.CitaException;
+
 @Getter
 @ToString(exclude = {"paciente", "medico", "sala"})
-@EqualsAndHashCode(exclude = {"paciente", "medico", "sala"})
-@SuperBuilder
+@EqualsAndHashCode(of = {"paciente", "medico", "fechaHora"}) // clave natural
+@Builder
 public class Cita implements Serializable {
 
     private final Paciente paciente;
@@ -29,7 +28,6 @@ public class Cita implements Serializable {
     @Setter
     private String observaciones;
 
-    @Builder
     public Cita(Paciente paciente,
                 Medico medico,
                 Sala sala,
@@ -51,8 +49,8 @@ public class Cita implements Serializable {
                 paciente.getDni(),
                 medico.getDni(),
                 sala.getNumero(),
-                fechaHora.toString(),
-                costo.toString(),
+                fechaHora,
+                costo,
                 estado.name(),
                 observaciones.replaceAll(",", ";"));
     }
@@ -78,15 +76,9 @@ public class Cita implements Serializable {
         Medico medico = medicos.get(dniMedico);
         Sala sala = salas.get(numeroSala);
 
-        if (paciente == null) {
-            throw new CitaException("Paciente no encontrado: " + dniPaciente);
-        }
-        if (medico == null) {
-            throw new CitaException("Médico no encontrado: " + dniMedico);
-        }
-        if (sala == null) {
-            throw new CitaException("Sala no encontrada: " + numeroSala);
-        }
+        if (paciente == null) throw new CitaException("Paciente no encontrado: " + dniPaciente);
+        if (medico == null) throw new CitaException("Médico no encontrado: " + dniMedico);
+        if (sala == null) throw new CitaException("Sala no encontrada: " + numeroSala);
 
         Cita cita = Cita.builder()
                 .paciente(paciente)
@@ -102,4 +94,3 @@ public class Cita implements Serializable {
         return cita;
     }
 }
-
