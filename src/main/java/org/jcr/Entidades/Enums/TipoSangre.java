@@ -1,4 +1,10 @@
 package org.jcr.Entidades.Enums;
+
+import lombok.*;
+
+@Getter
+@AllArgsConstructor
+
 public enum TipoSangre {
     A_POSITIVO("A+"),
     A_NEGATIVO("A-"),
@@ -11,11 +17,4 @@ public enum TipoSangre {
 
     private final String descripcion;
 
-    TipoSangre(String descripcion) {
-        this.descripcion = descripcion;
-    }
-
-    public String getDescripcion() {
-        return descripcion;
-    }
 }
