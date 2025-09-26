@@ -22,7 +22,6 @@ public class Sala implements Serializable {
     @Builder.Default
     private final List<Cita> citas = new ArrayList<>();
 
-    @Builder
     public Sala(String numero, String tipo, Departamento departamento) {
         this.numero = validarString(numero, "El número de sala no puede ser nulo ni vacío");
         this.tipo = validarString(tipo, "El tipo de sala no puede ser nulo ni vacío");
