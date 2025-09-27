@@ -37,7 +37,14 @@ public class CitaManager implements CitaService {
             throw new CitaException("La especialidad del médico no coincide con el departamento de la sala.");
         }
 
-        Cita cita = new Cita(paciente, medico, sala, fechaHora, costo);
+        Cita cita = Cita.builder()
+                .paciente(paciente)
+                .medico(medico)
+                .sala(sala)
+                .fechaHora(fechaHora)
+                .costo(costo)
+                .build();
+
         citas.add(cita);
 
         actualizarIndicePaciente(paciente, cita);
@@ -50,6 +57,7 @@ public class CitaManager implements CitaService {
 
         return cita;
     }
+
 
     private void validarCita(LocalDateTime fechaHora, BigDecimal costo) throws CitaException {
         if (fechaHora.isBefore(LocalDateTime.now())) {
