@@ -1,9 +1,5 @@
 package org.jcr.Entidades.Enums;
 
-import lombok.*;
-
-@Getter
-@AllArgsConstructor
 
 public enum EstadoCita {
     PROGRAMADA("Programada"),
@@ -14,4 +10,11 @@ public enum EstadoCita {
 
     private final String descripcion;
 
+    EstadoCita(String descripcion) {
+        this.descripcion = descripcion;
+    }
+
+    public String getDescripcion() {
+        return descripcion;
+    }
 }
