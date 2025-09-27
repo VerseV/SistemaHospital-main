@@ -12,7 +12,6 @@ import java.util.*;
 @ToString(callSuper = true, exclude = {"hospital", "citas"})
 @EqualsAndHashCode(callSuper = true, exclude = {"hospital", "citas"})
 @SuperBuilder
-
 public class Paciente extends Persona implements Serializable {
 
     private final HistoriaClinica historiaClinica;
@@ -20,15 +19,15 @@ public class Paciente extends Persona implements Serializable {
     private final String direccion;
     private Hospital hospital;
 
-    @Builder.Default
-    private final List<Cita> citas = new ArrayList<>();
-    
+    private final List<Cita> citas;
+
     public Paciente(String nombre, String apellido, String dni, LocalDate fechaNacimiento,
                     TipoSangre tipoSangre, String telefono, String direccion) {
         super(nombre, apellido, dni, fechaNacimiento, tipoSangre);
         this.telefono = validarString(telefono, "El teléfono no puede ser nulo ni vacío");
         this.direccion = validarString(direccion, "La dirección no puede ser nula ni vacía");
         this.historiaClinica = new HistoriaClinica(this);
+        this.citas = new ArrayList<>(); // ✅ inicializamos siempre
     }
 
     public void setHospital(Hospital hospital) {
@@ -59,3 +58,4 @@ public class Paciente extends Persona implements Serializable {
         return valor;
     }
 }
+

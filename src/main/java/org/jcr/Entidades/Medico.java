@@ -13,7 +13,6 @@ import java.util.*;
 @ToString(callSuper = true, exclude = {"departamento", "citas"})
 @EqualsAndHashCode(callSuper = true, exclude = {"departamento", "citas"})
 @SuperBuilder
-
 public class Medico extends Persona implements Serializable {
 
     private final Matricula matricula;
@@ -23,11 +22,13 @@ public class Medico extends Persona implements Serializable {
     @Builder.Default
     private final List<Cita> citas = new ArrayList<>();
 
+    // Constructor manual
     public Medico(String nombre, String apellido, String dni, LocalDate fechaNacimiento,
                   TipoSangre tipoSangre, String numeroMatricula, EspecialidadMedica especialidad) {
         super(nombre, apellido, dni, fechaNacimiento, tipoSangre);
         this.matricula = new Matricula(numeroMatricula);
         this.especialidad = Objects.requireNonNull(especialidad, "La especialidad no puede ser nula");
+        this.citas = new ArrayList<>(); // 👈 inicialización obligatoria para evitar el error
     }
 
     public void setDepartamento(Departamento departamento) {
@@ -37,7 +38,9 @@ public class Medico extends Persona implements Serializable {
     }
 
     public void addCita(Cita cita) {
-        this.citas.add(cita);
+        if (cita != null && !citas.contains(cita)) {
+            this.citas.add(cita);
+        }
     }
 
     public List<Cita> getCitas() {

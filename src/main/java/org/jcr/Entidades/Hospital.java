@@ -4,22 +4,16 @@ import lombok.*;
 import java.io.Serializable;
 import java.util.*;
 
-
 @Getter
 @ToString(exclude = {"departamentos", "pacientes"})
 @EqualsAndHashCode(exclude = {"departamentos", "pacientes"})
-@Builder
-
 public class Hospital implements Serializable {
 
     private final String nombre;
     private final String direccion;
     private final String telefono;
 
-    @Builder.Default
     private final List<Departamento> departamentos = new ArrayList<>();
-
-    @Builder.Default
     private final List<Paciente> pacientes = new ArrayList<>();
 
     @Builder
@@ -67,3 +61,4 @@ public class Hospital implements Serializable {
         return valor;
     }
 }
+
