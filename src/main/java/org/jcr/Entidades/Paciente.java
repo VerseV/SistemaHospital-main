@@ -27,7 +27,7 @@ public class Paciente extends Persona implements Serializable {
         this.telefono = validarString(telefono, "El teléfono no puede ser nulo ni vacío");
         this.direccion = validarString(direccion, "La dirección no puede ser nula ni vacía");
         this.historiaClinica = new HistoriaClinica(this);
-        this.citas = new ArrayList<>(); // ✅ inicializamos siempre
+        this.citas = new ArrayList<>();
     }
 
     public void setHospital(Hospital hospital) {

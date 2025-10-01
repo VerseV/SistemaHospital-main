@@ -28,7 +28,7 @@ public class Medico extends Persona implements Serializable {
         super(nombre, apellido, dni, fechaNacimiento, tipoSangre);
         this.matricula = new Matricula(numeroMatricula);
         this.especialidad = Objects.requireNonNull(especialidad, "La especialidad no puede ser nula");
-        this.citas = new ArrayList<>(); // 👈 inicialización obligatoria para evitar el error
+        this.citas = new ArrayList<>();
     }
 
     public void setDepartamento(Departamento departamento) {
